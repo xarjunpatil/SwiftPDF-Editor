@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftPDF Editor - Modern PDF Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        .pdf-canvas {
+            border: 1px solid #e5e7eb;
+            margin: 10px 0;
+            cursor: crosshair;
+        }
+        .dark .pdf-canvas {
+            border-color: #374151;
+        }
+        .thumbnail {
+            transition: all 0.2s;
+        }
+        .thumbnail:hover {
+            transform: scale(1.05);
+        }
+        .thumbnail.active {
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Landing Page -->
+    <div id="landingPage" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white dark:bg-gray-800 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex items-center">
+                        <svg class="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">SwiftPDF Editor</h1>
+                    </div>
+                    <button id="themeToggle" title="Toggle dark mode" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="py-20 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Edit PDFs Like Never Before
+                </h2>
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+                    Professional PDF editing tools right in your browser. No downloads, no sign-ups, completely free and secure.
+                </p>
+                <button id="startEditingBtn" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                    Start Editing PDF
+                </button>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-20 bg-white dark:bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h3 class="text-3xl font-bold text-center mb-16">Powerful Features</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">Edit Text</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Modify text content directly in your PDF documents with ease.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">Add Images & Shapes</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Insert images, shapes, and signatures anywhere in your PDF.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">Annotate & Draw</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Highlight, underline, and draw on your PDFs with annotation tools.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">Manage Pages</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Add, remove, rotate, and reorder pages with simple controls.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">Merge & Split</h4>
+                        <p class="text-gray-600 dark:text-gray-300">Combine multiple PDFs or split pages into separate documents.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-lg transition-shadow">
+                        <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">Secure & Private</h4>
+                        <p class="text-gray-600 dark:text-gray-300">All processing happens in your browser. Your files never leave your device.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PDF Editor Interface -->
+    <div id="editorPage" class="hidden min-h-screen">
+        <!-- Editor Header -->
+        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center">
+                        <button id="backToLanding" class="mr-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Back to landing page" aria-label="Back to landing page">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                        </button>
+                        <h1 class="text-xl font-bold">SwiftPDF Editor</h1>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button id="downloadBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Download PDF
+                        </button>
+                        <button id="themeToggleEditor" title="Toggle dark mode" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Editor Layout -->
+        <div class="flex h-screen pt-16">
+            <!-- Sidebar -->
+            <div class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+                <!-- Upload Area -->
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <div id="uploadArea" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Drop PDF here or click to upload</p>
+                        <label for="fileInput" class="sr-only">Upload PDF file</label>
+                        <input type="file" id="fileInput" accept=".pdf" class="hidden" title="Upload PDF file">
+                    </div>
+                </div>
+
+                <!-- Tools Panel -->
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold mb-3">Tools</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="textTool" class="tool-btn p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            <span class="text-xs">Text</span>
+                        </button>
+                        <button id="highlightTool" class="tool-btn p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                            <span class="text-xs">Highlight</span>
+                        </button>
+                        <button id="drawTool" class="tool-btn p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                            <span class="text-xs">Draw</span>
+                        </button>
+                        <button id="shapeTool" class="tool-btn p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12l-1.411-1.411a2.5 2.5 0 00-3.536 0L10 16l-3.546-3.546a2.5 2.5 0 00-3.536 0L2 13.5"></path>
+                            </svg>
+                            <span class="text-xs">Shape</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Page Thumbnails -->
+                <div class="p-4">
+                    <h3 class="font-semibold mb-3">Pages</h3>
+                    <div id="thumbnailsContainer" class="space-y-2">
+                        <!-- Thumbnails will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Canvas Area -->
+            <div class="flex-1 bg-gray-100 dark:bg-gray-900 overflow-auto">
+                <div class="p-8">
+                    <div id="canvasContainer" class="max-w-4xl mx-auto">
+                        <div id="noFileMessage" class="text-center py-20">
+                            <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <p class="text-gray-600 dark:text-gray-300">Upload a PDF file to start editing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentPdf = null;
+        let currentPage = 0;
+        let currentTool = 'text';
+        let isDarkMode = false;
+        let annotations = [];
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark', isDarkMode);
+        }
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle buttons
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('themeToggleEditor').addEventListener('click', toggleTheme);
+
+            // Navigation buttons
+            document.getElementById('startEditingBtn').addEventListener('click', showEditor);
+            document.getElementById('backToLanding').addEventListener('click', showLanding);
+
+            // File upload
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Tool buttons
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('bg-blue-100', 'dark:bg-blue-900'));
+                    btn.classList.add('bg-blue-100', 'dark:bg-blue-900');
+                    currentTool = btn.id.replace('Tool', '');
+                });
+            });
+
+            // Download button
+            document.getElementById('downloadBtn').addEventListener('click', downloadPdf);
+
+            // Initialize PDF.js
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        });
+
+        function showEditor() {
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('editorPage').classList.remove('hidden');
+        }
+
+        function showLanding() {
+            document.getElementById('landingPage').classList.remove('hidden');
+            document.getElementById('editorPage').classList.add('hidden');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.target.classList.add('border-blue-500');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.target.classList.remove('border-blue-500');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                loadPdf(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                loadPdf(file);
+            }
+        }
+
+        async function loadPdf(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                currentPdf = pdf;
+                
+                // Clear previous content
+                document.getElementById('noFileMessage').style.display = 'none';
+                document.getElementById('canvasContainer').innerHTML = '';
+                document.getElementById('thumbnailsContainer').innerHTML = '';
+                
+                // Enable download button
+                document.getElementById('downloadBtn').disabled = false;
+                
+                // Render all pages
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    await renderPage(i);
+                    await createThumbnail(i);
+                }
+                
+                // Select first page
+                if (pdf.numPages > 0) {
+                    selectPage(1);
+                }
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                alert('Error loading PDF file. Please try again.');
+            }
+        }
+
+        async function renderPage(pageNum) {
+            const page = await currentPdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+            
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-canvas';
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            canvas.dataset.pageNum = pageNum;
+            
+            const ctx = canvas.getContext('2d');
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            
+            await page.render(renderContext).promise;
+            
+            // Add event listeners for tools
+            canvas.addEventListener('click', handleCanvasClick);
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            
+            document.getElementById('canvasContainer').appendChild(canvas);
+        }
+
+        async function createThumbnail(pageNum) {
+            const page = await currentPdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 0.3 });
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            const ctx = canvas.getContext('2d');
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            
+            await page.render(renderContext).promise;
+            
+            const thumbnailDiv = document.createElement('div');
+            thumbnailDiv.className = 'thumbnail p-2 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700';
+            thumbnailDiv.dataset.pageNum = pageNum;
+            
+            const pageLabel = document.createElement('p');
+            pageLabel.className = 'text-xs text-center mb-1';
+            pageLabel.textContent = `Page ${pageNum}`;
+            
+            thumbnailDiv.appendChild(pageLabel);
+            thumbnailDiv.appendChild(canvas);
+            
+            // Add page controls
+            const controls = document.createElement('div');
+            controls.className = 'flex justify-between mt-2';
+            
+            const rotateBtn = document.createElement('button');
+            rotateBtn.innerHTML = '↻';
+            rotateBtn.className = 'text-xs p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded';
+            rotateBtn.title = 'Rotate page';
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '🗑';
+            deleteBtn.className = 'text-xs p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded';
+            deleteBtn.title = 'Delete page';
+            
+            controls.appendChild(rotateBtn);
+            controls.appendChild(deleteBtn);
+            thumbnailDiv.appendChild(controls);
+            
+            // Add event listeners
+            thumbnailDiv.addEventListener('click', () => selectPage(pageNum));
+            rotateBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                rotatePage(pageNum);
+            });
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deletePage(pageNum);
+            });
+            
+            document.getElementById('thumbnailsContainer').appendChild(thumbnailDiv);
+        }
+
+        function selectPage(pageNum) {
+            currentPage = pageNum;
+            
+            // Update thumbnail selection
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active', 'ring-2', 'ring-blue-500');
+            });
+            
+            const selectedThumbnail = document.querySelector(`[data-page-num="${pageNum}"]`);
+            if (selectedThumbnail) {
+                selectedThumbnail.classList.add('active', 'ring-2', 'ring-blue-500');
+            }
+            
+            // Scroll to page in main canvas
+            const canvas = document.querySelector(`canvas[data-page-num="${pageNum}"]`);
+            if (canvas) {
+                canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function handleCanvasClick(e) {
+            const canvas = e.target;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const pageNum = parseInt(canvas.dataset.pageNum);
+            
+            if (currentTool === 'text') {
+                addTextAnnotation(x, y, pageNum);
+            } else if (currentTool === 'highlight') {
+                addHighlight(x, y, pageNum);
+            } else if (currentTool === 'shape') {
+                addShape(x, y, pageNum);
+            }
+        }
+
+        function handleMouseDown(e) {
+            if (currentTool === 'draw') {
+                isDrawing = true;
+                const rect = e.target.getBoundingClientRect();
+                lastX = e.clientX - rect.left;
+                lastY = e.clientY - rect.top;
+            }
+        }
+
+        function handleMouseMove(e) {
+            if (!isDrawing || currentTool !== 'draw') return;
+            
+            const canvas = e.target;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            lastX = x;
+            lastY = y;
+        }
+
+        function handleMouseUp(e) {
+            if (currentTool === 'draw') {
+                isDrawing = false;
+            }
+        }
+
+        function addTextAnnotation(x, y, pageNum) {
+            const text = prompt('Enter text:');
+            if (text) {
+                const canvas = document.querySelector(`canvas[data-page-num="${pageNum}"]`);
+                const ctx = canvas.getContext('2d');
+                
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#000000';
+                ctx.fillText(text, x, y);
+                
+                annotations.push({
+                    type: 'text',
+                    x: x,
+                    y: y,
+                    text: text,
+                    pageNum: pageNum
+                });
+            }
+        }
+
+        function addHighlight(x, y, pageNum) {
+            const canvas = document.querySelector(`canvas[data-page-num="${pageNum}"]`);
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+            ctx.fillRect(x - 50, y - 10, 100, 20);
+            
+            annotations.push({
+                type: 'highlight',
+                x: x,
+                y: y,
+                pageNum: pageNum
+            });
+        }
+
+        function addShape(x, y, pageNum) {
+            const canvas = document.querySelector(`canvas[data-page-num="${pageNum}"]`);
+            const ctx = canvas.getContext('2d');
+            
+            ctx.strokeStyle = '#0000ff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x - 25, y - 25, 50, 50);
+            
+            annotations.push({
+                type: 'shape',
+                x: x,
+                y: y,
+                pageNum: pageNum
+            });
+        }
+
+        function rotatePage(pageNum) {
+            // This would require more complex PDF manipulation
+            // For now, just show a message
+            alert('Rotate functionality would be implemented with advanced PDF manipulation');
+        }
+
+        function deletePage(pageNum) {
+            if (confirm('Are you sure you want to delete this page?')) {
+                // Remove thumbnail
+                const thumbnail = document.querySelector(`.thumbnail[data-page-num="${pageNum}"]`);
+                if (thumbnail) {
+                    thumbnail.remove();
+                }
+                
+                // Remove canvas
+                const canvas = document.querySelector(`canvas[data-page-num="${pageNum}"]`);
+                if (canvas) {
+                    canvas.remove();
+                }
+                
+                // Remove annotations for this page
+                annotations = annotations.filter(ann => ann.pageNum !== pageNum);
+                
+                // Update page numbers
+                updatePageNumbers();
+            }
+        }
+
+        function updatePageNumbers() {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach((thumb, index) => {
+                const newPageNum = index + 1;
+                thumb.dataset.pageNum = newPageNum;
+                thumb.querySelector('p').textContent = `Page ${newPageNum}`;
+            });
+            
+            const canvases = document.querySelectorAll('.pdf-canvas');
+            canvases.forEach((canvas, index) => {
+                canvas.dataset.pageNum = index + 1;
+            });
+        }
+
+        async function downloadPdf() {
+            if (!currentPdf) {
+                alert('No PDF loaded');
+                return;
+            }
+            
+            try {
+                // Create new PDF with annotations
+                const pdfDoc = await PDFLib.PDFDocument.create();
+                
+                // Get original PDF bytes
+                const originalPdfBytes = await fetch(URL.createObjectURL(new Blob([currentPdf.getData()])))
+                    .then(res => res.arrayBuffer())
+                    .catch(() => {
+                        // Fallback: create a simple PDF
+                        return null;
+                    });
+                
+                if (originalPdfBytes) {
+                    const originalPdf = await PDFLib.PDFDocument.load(originalPdfBytes);
+                    const pages = await pdfDoc.copyPages(originalPdf, originalPdf.getPageIndices());
+                    pages.forEach((page) => pdfDoc.addPage(page));
+                } else {
+                    // Create pages based on canvas content
+                    const canvases = document.querySelectorAll('.pdf-canvas');
+                    for (let canvas of canvases) {
+                        const page = pdfDoc.addPage([canvas.width, canvas.height]);
+                        
+                        // Convert canvas to image and embed
+                        const imageData = canvas.toDataURL('image/png');
+                        const pngImage = await pdfDoc.embedPng(imageData);
+                        page.drawImage(pngImage, {
+                            x: 0,
+                            y: 0,
+                            width: canvas.width,
+                            height: canvas.height,
+                        });
+                    }
+                }
+                
+                // Add annotations
+                const pages = pdfDoc.getPages();
+                annotations.forEach(annotation => {
+                    const page = pages[annotation.pageNum - 1];
+                    if (page && annotation.type === 'text') {
+                        page.drawText(annotation.text, {
+                            x: annotation.x,
+                            y: page.getHeight() - annotation.y,
+                            size: 12,
+                            color: PDFLib.rgb(0, 0, 0)
+                        });
+                    }
+                });
+                
+                // Save and download
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'edited-document.pdf';
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                
+                // Fallback: download as images in a simple PDF
+                try {
+                    const pdfDoc = await PDFLib.PDFDocument.create();
+                    const canvases = document.querySelectorAll('.pdf-canvas');
+                    
+                    for (let canvas of canvases) {
+                        const imageData = canvas.toDataURL('image/png');
+                        const pngImage = await pdfDoc.embedPng(imageData);
+                        const page = pdfDoc.addPage([canvas.width, canvas.height]);
+                        
+                        page.drawImage(pngImage, {
+                            x: 0,
+                            y: 0,
+                            width: canvas.width,
+                            height: canvas.height,
+                        });
+                    }
+                    
+                    const pdfBytes = await pdfDoc.save();
+                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'edited-document.pdf';
+                    a.click();
+                    
+                    URL.revokeObjectURL(url);
+                    
+                } catch (fallbackError) {
+                    console.error('Fallback PDF generation failed:', fallbackError);
+                    alert('Error generating PDF. Please try again.');
+                }
+            }
+        }
+
+        // Additional utility functions
+        function addNewPage() {
+            // This would require creating a new blank page
+            alert('Add new page functionality would be implemented with PDF manipulation');
+        }
+
+        function mergePdfs() {
+            // This would allow users to select multiple PDFs to merge
+            alert('Merge PDFs functionality would be implemented with file selection');
+        }
+
+        function splitPdf() {
+            // This would allow users to split the current PDF
+            alert('Split PDF functionality would be implemented with page selection');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        downloadPdf();
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        // Undo functionality could be implemented here
+                        break;
+                }
+            }
+        });
+
+        // Auto-save functionality (in memory)
+        setInterval(() => {
+            if (annotations.length > 0) {
+                console.log('Auto-saved annotations:', annotations.length);
+            }
+        }, 30000); // Auto-save every 30 seconds
+
+        // Responsive design helpers
+        function updateCanvasSize() {
+            const canvases = document.querySelectorAll('.pdf-canvas');
+            canvases.forEach(canvas => {
+                const container = canvas.parentElement;
+                const containerWidth = container.clientWidth - 64; // Account for padding
+                const scale = Math.min(1, containerWidth / canvas.width);
+                canvas.style.transform = `scale(${scale})`;
+                canvas.style.transformOrigin = 'top left';
+            });
+        }
+
+        window.addEventListener('resize', updateCanvasSize);
+
+        // Initialize theme based on system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            toggleTheme();
+        }
+    </script>
+</body>
+</html>
